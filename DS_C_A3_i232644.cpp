@@ -96,6 +96,9 @@ struct GameNode
     float fileSize;
     int downloads;
 
+    GameNode *left;
+    GameNode *right;
+
     GameNode(unsigned long long id, string nm, string dev, string pub,
              float size, int dwnlds)
     {
@@ -105,11 +108,51 @@ struct GameNode
         publisher = pub;
         fileSize = size;
         downloads = dwnlds;
+        left = right = nullptr;
     }
 };
 
 class GameTree
 {
+    GameNode *root;
+
+  public:
+    GameTree() { root = nullptr; }
+    ~GameTree() {}
+
+    void insertNewGame(unsigned long long id, string name, string developer,
+                       string publisher, float size, int downloads)
+    {
+        GameNode *newNode =
+            new GameNode(id, name, developer, publisher, size, downloads);
+        insertNode(root, newNode);
+    }
+
+    GameNode *insertNode(GameNode *root, GameNode *newNode)
+    {
+        if (root == nullptr)
+        {
+            cout << "\nGame with id " << newNode->gameID
+                 << " successfully added!";
+            return newNode;
+        }
+
+        // left subtree
+        if (newNode->gameID < root->gameID)
+            root->left = insertNode(root->left, newNode);
+
+        // right subtree
+        else if (newNode->gameID > root->gameID)
+            root->right = insertNode(root->right, newNode);
+
+        // if equal
+        else
+        {
+            cout << "\nthis Game ID already exists!";
+            cout << "\ncannot be re-entered!";
+        }
+        return root;
+    }
 };
 
 // random function
@@ -130,12 +173,13 @@ int main()
     PlayerTree playerTree;
     GameTree gameTree;
 
+    // READING THE PLAYER FILE
+    cout << "\n\nREADING THE PLAYER FILE: ";
     ifstream file("Players.csv");
     string line;
 
     if (file.is_open())
     {
-        string line;
         while (getline(file, line))
         {
 
@@ -159,6 +203,40 @@ int main()
                                            email, password);
             }
             // else skip the line
+        }
+    }
+    else
+    {
+        cout << "file not opened" << endl;
+        return 1;
+    }
+
+    file.close(); // Close the file
+
+    // READING THE GAME FILE
+    cout << "\n\nREADING THE GAME FILE: ";
+    ifstream file2("Games.csv");
+
+    if (file2.is_open())
+    {
+        while (getline(file2, line))
+        {
+
+            // making the line a stream
+            stringstream stream(line);
+            string gameID, gameName, developer, publisher, size, downloads;
+
+            // extracting info from the stream
+            getline(stream, gameID, ',');
+            getline(stream, gameName, ',');
+            getline(stream, developer, ',');
+            getline(stream, publisher, ',');
+            getline(stream, size, ',');
+            getline(stream, downloads, ',');
+
+            // insert it to the game tree
+            gameTree.insertNewGame(stoull(gameID), gameName, developer,
+                                   publisher, stof(size), stoi(downloads));
         }
     }
     else
