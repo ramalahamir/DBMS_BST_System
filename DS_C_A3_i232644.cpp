@@ -233,11 +233,9 @@ bool isNumeric_check(string str)
     return true;
 }
 
-int main()
+void ReadCSVs(PlayerTree *&playerTree, GameTree *&gameTree)
 {
     int seed = random();
-    PlayerTree playerTree;
-    GameTree gameTree;
 
     // READING THE PLAYER FILE
     cout << "\n\nREADING THE PLAYER FILE: ";
@@ -302,17 +300,14 @@ int main()
                 }
 
                 // insert it to the player tree
-                playerTree.insertNewPlayer(plrID, playerName, phone, email,
-                                           password, GamesPlayed_byPlayer);
+                playerTree->insertNewPlayer(plrID, playerName, phone, email,
+                                            password, GamesPlayed_byPlayer);
             }
             // else skip the line
         }
     }
     else
-    {
         cout << "file not opened" << endl;
-        return 1;
-    }
 
     file.close(); // Close the file
 
@@ -353,19 +348,25 @@ int main()
                 dwnlds = stoi(downloads);
 
             // insert it to the game tree
-            gameTree.insertNewGame(gmeID, gameName, developer, publisher, sz,
-                                   dwnlds);
+            gameTree->insertNewGame(gmeID, gameName, developer, publisher, sz,
+                                    dwnlds);
         }
     }
     else
-    {
         cout << "file not opened" << endl;
-        return 1;
-    }
 
     file.close(); // Close the file
 
     cout << "\nGames tree Data successfully made!";
+}
+
+int main()
+{
+    PlayerTree *playerTree = new PlayerTree();
+    GameTree *gameTree = new GameTree();
+
+    // reading the data and setting up the trees
+    ReadCSVs(playerTree, gameTree);
 
     return 0;
 }
