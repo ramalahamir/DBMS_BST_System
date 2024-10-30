@@ -212,6 +212,36 @@ class PlayerTree
         return root;
     }
 
+    PlayerNode *RetrieveNode(PlayerNode *root, unsigned long long ID)
+    {
+        if (root == nullptr)
+            return nullptr;
+        if (root->playerID == ID)
+            return root;
+        else if (ID < root->playerID)
+            return RetrieveNode(root->left, ID);
+        else
+            return RetrieveNode(root->right, ID);
+        return nullptr;
+    }
+
+    PlayerNode *RetrievePlayer(unsigned long long playerID)
+    {
+        return RetrieveNode(root, playerID);
+    }
+
+    // display information related to Game
+    void displayPlayerInfo(PlayerNode *root)
+    {
+        cout << "\nPlayer Info: ";
+        cout << "\nPlayer ID: " << root->playerID;
+        cout << "\nPlayer Name: " << root->name;
+        cout << "\nplayer phone no: " << root->phone_no;
+        cout << "\nPlayer email: " << root->email;
+        cout << "\nPlayer password: " << root->password;
+        // cout << "\nGames played: " << root->gamesPlayed;
+    }
+
     // functions for calling from main()
     ////////////////////////////////////
 
@@ -327,6 +357,19 @@ class GameTree
         return root;
     }
 
+    GameNode *RetrieveNode(GameNode *root, unsigned long long ID)
+    {
+        if (root == nullptr)
+            return nullptr;
+        if (root->gameID == ID)
+            return root;
+        else if (ID < root->gameID)
+            return RetrieveNode(root->left, ID);
+        else
+            return RetrieveNode(root->right, ID);
+        return nullptr;
+    }
+
     // functions for calling from main()
     ////////////////////////////////////
 
@@ -342,8 +385,23 @@ class GameTree
     {
         root = deleteNode(root, gameID);
     }
-    //  bool searchGame(unsigned long long gameID) { return
-    // searchNode(root, gameID); }
+
+    GameNode *RetrieveGame(unsigned long long gameID)
+    {
+        return RetrieveNode(root, gameID);
+    }
+
+    // display information related to Game
+    void displayGameInfo(GameNode *root)
+    {
+        cout << "\nGame Info: ";
+        cout << "\nGame ID: " << root->gameID;
+        cout << "\nGame Name: " << root->name;
+        cout << "\nGame developer: " << root->developer;
+        cout << "\nGame Publisher: " << root->publisher;
+        cout << "\nFile size (in GB): " << root->fileSize;
+        cout << "\nNumber of downloads: " << root->downloads;
+    }
 };
 
 // random function
@@ -521,196 +579,235 @@ int main()
 
     // reading the data and setting up the trees
     ReadCSVs(playerTree, gameTree);
-
     int input;
-    cout << "\n------------------------------------";
-    cout << "\nQuery Menu: ";
-    cout << "\nwhich tree do you wish to explore?";
-    cout << "\n1. Player Tree"
-         << "\n2. Game Tree";
-    cout << "\n------------------------------------";
 
-    cout << "\nenter: ";
-    cin >> input;
-
-    switch (input)
+    do
     {
-        case 1:
+        cout << "\n------------------------------------";
+        cout << "\nQuery Menu: ";
+        cout << "\nwhich tree do you wish to explore?";
+        cout << "\n1. Player Tree"
+             << "\n2. Game Tree";
+        cout << "\n------------------------------------";
+
+        cout << "\nenter: (enter '0' to quit) ";
+        cin >> input;
+
+        switch (input)
         {
-            cout << "\n------------------------------------";
-            cout << "\nchoose the following operations: ";
-            cout << "\n1. insertion"
-                 << "\n2. search / retrieval"
-                 << "\n3. deletion"
-                 << "\n4. save data"
-                 << "\n5. show N layers"
-                 << "\n6. show layer number"
-                 << "\n7. show path"
-                 << "\n8. edit entry"
-                 << "\n9. top N players"
-                 << "\n10. show details"
-                 << "\n11. has played";
-            cout << "\n------------------------------------";
-
-            int choice;
-            cout << "\nenter: ";
-            cin >> choice;
-
-            switch (choice)
+            case 1:
             {
-                case 1:
+                cout << "\n------------------------------------";
+                cout << "\nchoose the following operations: ";
+                cout << "\n1. insertion"
+                     << "\n2. search / retrieval"
+                     << "\n3. deletion"
+                     << "\n4. save data"
+                     << "\n5. show N layers"
+                     << "\n6. show layer number"
+                     << "\n7. show path"
+                     << "\n8. edit entry"
+                     << "\n9. top N players"
+                     << "\n10. show details"
+                     << "\n11. has played";
+                cout << "\n------------------------------------";
+
+                int choice;
+                cout << "\nenter: ";
+                cin >> choice;
+
+                switch (choice)
                 {
-                    cout << "\n------------------------------------";
-                    cout << "\n Player Insertion: ";
-                    cout << "\n------------------------------------";
-                    cout << "\nenter player info: ";
-
-                    unsigned long long playerID;
-                    string name;
-                    string phone;
-                    string email;
-                    string password;
-
-                    cout << "\nenter player ID: ";
-                    cin >> playerID;
-                    cout << "Enter player name: ";
-                    cin.ignore();
-                    getline(cin, name);
-                    cout << "Enter player phone number: ";
-                    getline(cin, phone);
-                    cout << "Enter player email: ";
-                    getline(cin, email);
-                    cout << "Enter player password: ";
-                    getline(cin, password);
-
-                    // record of played games of the player
-                    GamesPlayedTree *GamesPlayed_byPlayer =
-                        new GamesPlayedTree();
-                    int n;
-                    cout << "\nhow many games has the user played?";
-                    cout << "\nenter number: ";
-                    cin >> n;
-                    cout << "\nenter game record one by one: ";
-
-                    for (int i = 0; i < n; i++)
+                    case 0:
+                        break;
+                    case 1:
                     {
-                        // get the info for single game played node
-                        unsigned long long gameID;
-                        cout << "\nenter game Id: ";
-                        cin >> gameID;
-                        double hrsPlayed;
-                        cout << "enter hours played: ";
-                        cin >> hrsPlayed;
-                        int achievements;
-                        cout << "enter no of achievements unlocked: ";
-                        cin >> achievements;
+                        cout << "\n------------------------------------";
+                        cout << "\n Player Insertion: ";
+                        cout << "\n------------------------------------";
+                        cout << "\nenter player info: ";
 
-                        // insert it to the tree
-                        GamesPlayed_byPlayer->insertGamesPlayed(
-                            gameID, hrsPlayed, achievements);
+                        unsigned long long playerID;
+                        string name;
+                        string phone;
+                        string email;
+                        string password;
+
+                        cout << "\nenter player ID: ";
+                        cin >> playerID;
+                        cout << "Enter player name: ";
+                        cin.ignore();
+                        getline(cin, name);
+                        cout << "Enter player phone number: ";
+                        getline(cin, phone);
+                        cout << "Enter player email: ";
+                        getline(cin, email);
+                        cout << "Enter player password: ";
+                        getline(cin, password);
+
+                        // record of played games of the player
+                        GamesPlayedTree *GamesPlayed_byPlayer =
+                            new GamesPlayedTree();
+                        int n;
+                        cout << "\nhow many games has the user played?";
+                        cout << "\nenter number: ";
+                        cin >> n;
+                        cout << "\nenter game record one by one: ";
+
+                        for (int i = 0; i < n; i++)
+                        {
+                            // get the info for single game played node
+                            unsigned long long gameID;
+                            cout << "\nenter game Id: ";
+                            cin >> gameID;
+                            double hrsPlayed;
+                            cout << "enter hours played: ";
+                            cin >> hrsPlayed;
+                            int achievements;
+                            cout << "enter no of achievements unlocked: ";
+                            cin >> achievements;
+
+                            // insert it to the tree
+                            GamesPlayed_byPlayer->insertGamesPlayed(
+                                gameID, hrsPlayed, achievements);
+                        }
+
+                        // insert the new player into the dataset
+                        playerTree->insertNewPlayer(playerID, name, phone,
+                                                    email, password,
+                                                    GamesPlayed_byPlayer);
+                        cout << "insertion of player node successfull!";
+                        break;
                     }
+                    case 2:
+                    {
+                        cout << "\n------------------------------------";
+                        cout << "\n Player Retrieval: ";
+                        cout << "\n------------------------------------";
+                        unsigned long long playerID;
+                        cout << "\nenter playerID: ";
+                        cin >> playerID;
 
-                    // insert the new player into the dataset
-                    playerTree->insertNewPlayer(playerID, name, phone, email,
-                                                password, GamesPlayed_byPlayer);
-                    cout << "insertion of player node successfull!";
-                    break;
+                        // show the node to the user
+                        PlayerNode *Node = playerTree->RetrievePlayer(playerID);
+                        if (Node == nullptr)
+                            cout << "no such player exists!";
+                        else
+                            playerTree->displayPlayerInfo(Node);
+                        break;
+                    }
+                    case 3:
+                    {
+                        cout << "\n------------------------------------";
+                        cout << "\n Player Deletion: ";
+                        cout << "\n------------------------------------";
+                        unsigned long long playerID;
+                        cout << "\nenter player ID: ";
+                        cin >> playerID;
+                        // delete the player
+                        playerTree->deletePlayer(playerID);
+                        cout << "deletion of player node successfull!";
+                        break;
+                    }
+                    default:
+                        cout << "\ninvalid option entered!";
+                        break;
                 }
-                case 3:
-                {
-                    cout << "\n------------------------------------";
-                    cout << "\n Player Deletion: ";
-                    cout << "\n------------------------------------";
-                    unsigned long long playerID;
-                    cout << "\nenter player ID: ";
-                    cin >> playerID;
-                    // delete the player
-                    playerTree->deletePlayer(playerID);
-                    cout << "deletion of player node successfull!";
-                    break;
-                }
-                default:
-                    cout << "\ninvalid option entered!";
-                    break;
+                break;
             }
-            break;
-        }
-        case 2:
-        {
-            cout << "\n------------------------------------";
-            cout << "\nchoose the following operations: ";
-            cout << "\n1. insertion"
-                 << "\n2. search / retrieval"
-                 << "\n3. deletion"
-                 << "\n4. save data"
-                 << "\n5. show N layers"
-                 << "\n6. show layer number"
-                 << "\n7. show path"
-                 << "\n8. edit entry";
-            cout << "\n------------------------------------";
-
-            int choice;
-            cout << "\nenter: ";
-            cin >> choice;
-
-            switch (choice)
+            case 2:
             {
-                case 1:
+                cout << "\n------------------------------------";
+                cout << "\nchoose the following operations: ";
+                cout << "\n1. insertion"
+                     << "\n2. search / retrieval"
+                     << "\n3. deletion"
+                     << "\n4. save data"
+                     << "\n5. show N layers"
+                     << "\n6. show layer number"
+                     << "\n7. show path"
+                     << "\n8. edit entry";
+                cout << "\n------------------------------------";
+
+                int choice;
+                cout << "\nenter: ";
+                cin >> choice;
+
+                switch (choice)
                 {
-                    cout << "\n------------------------------------";
-                    cout << "\n Game Insertion: ";
-                    cout << "\n------------------------------------";
-                    cout << "\nenter game info: ";
+                    case 1:
+                    {
+                        cout << "\n------------------------------------";
+                        cout << "\n Game Insertion: ";
+                        cout << "\n------------------------------------";
+                        cout << "\nenter game info: ";
 
-                    unsigned long long gameID;
-                    string name;
-                    string developer;
-                    string publisher;
-                    float size;
-                    int downloads;
+                        unsigned long long gameID;
+                        string name;
+                        string developer;
+                        string publisher;
+                        float size;
+                        int downloads;
 
-                    cout << "\nEnter game ID: ";
-                    cin >> gameID;
-                    cin.ignore();
-                    cout << "Enter game name: ";
-                    getline(cin, name);
-                    cout << "Enter game developer: ";
-                    getline(cin, developer);
-                    cout << "Enter game publisher: ";
-                    getline(cin, publisher);
-                    cout << "Enter game size (in GB): ";
-                    cin >> size;
-                    cout << "Enter number of downloads: ";
-                    cin >> downloads;
+                        cout << "\nEnter game ID: ";
+                        cin >> gameID;
+                        cin.ignore();
+                        cout << "Enter game name: ";
+                        getline(cin, name);
+                        cout << "Enter game developer: ";
+                        getline(cin, developer);
+                        cout << "Enter game publisher: ";
+                        getline(cin, publisher);
+                        cout << "Enter game size (in GB): ";
+                        cin >> size;
+                        cout << "Enter number of downloads: ";
+                        cin >> downloads;
 
-                    // insert the new game into the tree
-                    gameTree->insertNewGame(gameID, name, developer, publisher,
-                                            size, downloads);
-                    cout << "insertion of game node successfull!";
-                    break;
+                        // insert the new game into the tree
+                        gameTree->insertNewGame(gameID, name, developer,
+                                                publisher, size, downloads);
+                        cout << "insertion of game node successfull!";
+                        break;
+                    }
+                    case 2:
+                    {
+                        cout << "\n------------------------------------";
+                        cout << "\n Game Retrieval: ";
+                        cout << "\n------------------------------------";
+                        unsigned long long gameID;
+                        cout << "\nenter gameID: ";
+                        cin >> gameID;
+                        // show the node to the user
+                        GameNode *Node = gameTree->RetrieveGame(gameID);
+                        if (Node == nullptr)
+                            cout << "Node doesn't exist!";
+                        else
+                            gameTree->displayGameInfo(Node);
+                        break;
+                    }
+                    case 3:
+                    {
+                        cout << "\n------------------------------------";
+                        cout << "\n Game Deletion: ";
+                        cout << "\n------------------------------------";
+                        unsigned long long gameID;
+                        cout << "\nenter game ID: ";
+                        cin >> gameID;
+                        // delete the game
+                        gameTree->deleteGame(gameID);
+                        cout << "deletion of game node successfull!";
+                        break;
+                    }
+                    default:
+                        cout << "\ninvalid option entered!";
+                        break;
                 }
-                case 3:
-                {
-                    cout << "\n------------------------------------";
-                    cout << "\n Game Deletion: ";
-                    cout << "\n------------------------------------";
-                    unsigned long long gameID;
-                    cout << "\nenter game ID: ";
-                    cin >> gameID;
-                    // delete the game
-                    gameTree->deleteGame(gameID);
-                    cout << "deletion of game node successfull!";
-                    break;
-                }
-                default:
-                    cout << "\ninvalid option entered!";
-                    break;
+                break;
             }
-            break;
+            default:
+                cout << "\ninvalid input!";
+                return 0;
         }
-        default:
-            cout << "\ninvalid input!";
-            return 0;
-    }
+    } while (input != 0);
     return 0;
 }
