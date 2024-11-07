@@ -5,6 +5,57 @@
 
 using namespace std;
 
+class Node
+{
+  public:
+    int data;
+    Node *next;
+
+    Node(int d)
+    {
+        data = d;
+        next = nullptr;
+    }
+};
+
+class Queue
+{
+  private:
+    Node *front;
+    Node *rear;
+
+  public:
+    Queue() { front = rear = nullptr; }
+    void enqueue(int val)
+    {
+        Node *newNode = new Node(val);
+        if (rear == nullptr)
+        {
+            front = rear = newNode;
+        }
+        else
+        {
+            rear->next = newNode;
+            rear = newNode;
+        }
+    }
+    void dequeue()
+    {
+        if (front == nullptr)
+            return;
+
+        Node *temp = front;
+        front = front->next;
+
+        // if queue becomes empty while dequeueing
+        if (front == nullptr)
+            rear = nullptr;
+
+        delete temp;
+    }
+    bool isEmpty() { return front == nullptr; }
+};
+
 struct GamesPlayedNode
 {
     unsigned long long gameID;
@@ -107,6 +158,8 @@ class GamesPlayedTree
         saveData(root->left, file);
         saveData(root->right, file);
     }
+
+    void print_N_layers(int N) {}
 
     // functions for calling from main()
     ////////////////////////////////////
@@ -565,10 +618,9 @@ void ReadCSVs(PlayerTree *&playerTree, GameTree *&gameTree)
                     // checking if the read string is valid or not
                     if (isNumeric_check(gamePlayedID))
                         id = stoull(gamePlayedID);
-                    if (isNumeric_check(hrsPlayed))
-                        hrs = stod(hrsPlayed);
-                    if (isNumeric_check(achievements))
-                        ach = stoi(achievements);
+
+                    hrs = stod(hrsPlayed);
+                    ach = stoi(achievements);
 
                     // insert the gamePlayed info to the tree
                     GamesPlayed_byPlayer->insertGamesPlayed(id, hrs, ach);
@@ -617,10 +669,10 @@ void ReadCSVs(PlayerTree *&playerTree, GameTree *&gameTree)
 
             if (isNumeric_check(gameID))
                 gmeID = stoull(gameID);
-            if (isNumeric_check(size))
-                sz = stof(size);
-            if (isNumeric_check(downloads))
-                dwnlds = stoi(downloads);
+            // if (isNumeric_check(size))
+            sz = stof(size);
+            // if (isNumeric_check(downloads))
+            dwnlds = stoi(downloads);
 
             // insert it to the game tree
             gameTree->insertNewGame(gmeID, gameName, developer, publisher, sz,
