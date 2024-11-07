@@ -5,55 +5,59 @@
 
 using namespace std;
 
-class Node
+struct Node
 {
-  public:
-    int data;
+    unsigned long long ID;
     Node *next;
 
-    Node(int d)
+    Node(unsigned long long id)
     {
-        data = d;
+        ID = id;
         next = nullptr;
     }
 };
 
 class Queue
 {
-  private:
     Node *front;
     Node *rear;
+    int size;
 
   public:
-    Queue() { front = rear = nullptr; }
-    void enqueue(int val)
+    Queue()
     {
-        Node *newNode = new Node(val);
-        if (rear == nullptr)
-        {
-            front = rear = newNode;
-        }
-        else
-        {
-            rear->next = newNode;
-            rear = newNode;
-        }
+        front = rear = nullptr;
+        size = 0;
     }
-    void dequeue()
+    bool isEmpty() { return front == nullptr; }
+
+    void enqueue(unsigned long long id)
     {
-        if (front == nullptr)
+        Node *new_node = new Node(id);
+        if (isEmpty())
+        {
+            front = rear = new_node;
             return;
+        }
+        rear->next = new_node;
+        rear = new_node;
+        size++;
+    }
+    unsigned long long dequeue()
+    {
+        if (isEmpty())
+            return -1;
 
         Node *temp = front;
         front = front->next;
 
-        // if queue becomes empty while dequeueing
         if (front == nullptr)
             rear = nullptr;
 
-        delete temp;
+        size--;
+        return temp->ID;
     }
-    bool isEmpty() { return front == nullptr; }
+    int Size() { return size; }
 };
 
 struct GamesPlayedNode
@@ -159,8 +163,6 @@ class GamesPlayedTree
         saveData(root->right, file);
     }
 
-    void print_N_layers(int N) {}
-
     // functions for calling from main()
     ////////////////////////////////////
 
@@ -210,6 +212,16 @@ struct PlayerNode
         // reference to the original tree
         gamesPlayed = GamesPlayed_byPlayer;
     }
+    // display information related to Game
+    void displayPlayerInfo()
+    {
+        cout << "\nPlayer Info: ";
+        cout << "\nPlayer ID: " << playerID;
+        cout << "\nPlayer Name: " << name;
+        cout << "\nplayer phone no: " << phone_no;
+        cout << "\nPlayer email: " << email;
+        cout << "\nPlayer password: " << password;
+    }
 };
 
 class PlayerTree
@@ -219,6 +231,17 @@ class PlayerTree
   public:
     PlayerTree() { root = nullptr; }
     ~PlayerTree() {}
+
+    int height(PlayerNode *root)
+    {
+        if (root == nullptr)
+            return -1;
+
+        int left_height = height(root->left);
+        int right_height = height(root->right);
+
+        return 1 + max(left_height, right_height);
+    }
 
     PlayerNode *insertNode(PlayerNode *root, PlayerNode *newNode)
     {
@@ -314,6 +337,57 @@ class PlayerTree
         saveData(root->right, file);
     }
 
+    // printing in breadth first order till N layer
+    void print_N_layers(int N)
+    {
+        if (root == nullptr)
+            return;
+
+        Queue Q;
+        Q.enqueue(root->playerID); // size of layer one = 1
+
+        int layer = 1;
+        while (layer <= N)
+        {
+            // get the size of each layer
+            int layerSize = Q.Size();
+            int s = 0;
+
+            cout << "\n------------------------------------";
+            cout << "\nlayer no: " << layer;
+            cout << "\n------------------------------------";
+
+            while (s < layerSize)
+            {
+                unsigned long long ID = Q.dequeue();
+                PlayerNode *curr = RetrievePlayer(ID);
+
+                cout << "\n------------------------------------";
+                curr->displayPlayerInfo();
+                cout << "\n------------------------------------";
+
+                if (curr->left != nullptr)
+                {
+                    Q.enqueue(curr->left->playerID);
+                }
+                if (curr->right != nullptr)
+                {
+                    Q.enqueue(curr->right->playerID);
+                }
+                s += 2; // because 2 childern are being inserted
+            }
+            layer++; // move to the next layer
+        }
+    }
+
+    int layerNumber(unsigned long long ID)
+    {
+        PlayerNode *temp = RetrievePlayer(ID);
+        // subtracting temp's height - root height from
+        int layer = rootHeight() - height(temp);
+        return layer;
+    }
+
     // functions for calling from main()
     ////////////////////////////////////
 
@@ -342,17 +416,8 @@ class PlayerTree
         return RetrieveNode(root, playerID);
     }
 
-    // display information related to Game
-    void displayPlayerInfo(PlayerNode *root)
-    {
-        cout << "\nPlayer Info: ";
-        cout << "\nPlayer ID: " << root->playerID;
-        cout << "\nPlayer Name: " << root->name;
-        cout << "\nplayer phone no: " << root->phone_no;
-        cout << "\nPlayer email: " << root->email;
-        cout << "\nPlayer password: " << root->password;
-        // cout << "\nGames played: " << root->gamesPlayed;
-    }
+    // root height
+    int rootHeight() { return height(root); }
 };
 
 struct GameNode
@@ -472,8 +537,8 @@ class GameTree
         // else write the player data
         file << endl
              << root->gameID << ',' << root->name << ',' << root->developer
-             << ',' << root->publisher << ',' << root->fileSize,
-            ',' << root->downloads;
+             << ',' << root->publisher << ',' << root->fileSize << ','
+             << root->downloads;
 
         // save data in preorder traversal (root, left, right)
         saveData(root->left, file);
@@ -810,7 +875,7 @@ int main()
                         if (Node == nullptr)
                             cout << "no such player exists!";
                         else
-                            playerTree->displayPlayerInfo(Node);
+                            Node->displayPlayerInfo();
                         break;
                     }
                     case 3:
@@ -834,6 +899,38 @@ int main()
                         cout << "\n Saving Player data to "
                                 "'savePlayerData.csv' .... completed!";
                         cout << "\n------------------------------------";
+                        break;
+                    }
+                    case 5:
+                    {
+                        cout << "\n------------------------------------";
+                        cout << "\nPrinting N layers: ";
+                        cout << "\n------------------------------------";
+                        cout << "\nenter N: ";
+                        int N;
+                        cin >> N;
+
+                        // if N is negative or greater than layer
+                        if (N <= 0)
+                            cout << "\ninvalid input! N cannot be negative";
+                        else if (N > playerTree->rootHeight())
+                            cout << "\nLayer Limit was Reached, can’t go "
+                                    "further";
+                        else
+                            playerTree->print_N_layers(N);
+                        break;
+                    }
+                    case 6:
+                    {
+                        cout << "\n------------------------------------";
+                        cout << "\nPrinting corresponding layer: ";
+                        cout << "\n------------------------------------";
+                        cout << "\nenter player ID: ";
+
+                        unsigned long long ID;
+                        cin >> ID;
+                        cout << "\nlayer of " << ID << " is "
+                             << playerTree->layerNumber(ID);
                         break;
                     }
                     default:
