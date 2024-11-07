@@ -384,7 +384,11 @@ class PlayerTree
     {
         PlayerNode *temp = RetrievePlayer(ID);
         // subtracting temp's height - root height from
-        int layer = rootHeight() - height(temp);
+        int layer = -1;
+        if (temp != nullptr)
+            layer = rootHeight() - height(temp);
+        else
+            cout << "\nID doesn't exist!";
         return layer;
     }
 
@@ -452,6 +456,17 @@ class GameTree
   public:
     GameTree() { root = nullptr; }
     ~GameTree() {}
+
+    int height(GameNode *root)
+    {
+        if (root == nullptr)
+            return -1;
+
+        int left_height = height(root->left);
+        int right_height = height(root->right);
+
+        return 1 + max(left_height, right_height);
+    }
 
     GameNode *insertNode(GameNode *root, GameNode *newNode)
     {
@@ -545,6 +560,18 @@ class GameTree
         saveData(root->right, file);
     }
 
+    int layerNumber(unsigned long long ID)
+    {
+        GameNode *temp = RetrieveGame(ID);
+        // subtracting temp's height - root height from
+        int layer = -1;
+        if (temp != nullptr)
+            layer = rootHeight() - height(temp);
+        else
+            cout << "\nID doesn't exist!";
+        return layer;
+    }
+
     // functions for calling from main()
     ////////////////////////////////////
 
@@ -582,6 +609,9 @@ class GameTree
         cout << "\nFile size (in GB): " << root->fileSize;
         cout << "\nNumber of downloads: " << root->downloads;
     }
+
+    // root height
+    int rootHeight() { return height(root); }
 };
 
 // random function
