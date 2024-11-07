@@ -94,9 +94,24 @@ class GamesPlayedTree
         return root;
     }
 
+    void saveData(GamesPlayedNode *root, ofstream &file)
+    {
+        if (root == nullptr)
+            return;
+
+        // writing the data
+        file << root->gameID << ',' << root->hoursPlayed << ','
+             << root->achievements << ',';
+
+        // traversing the nodes in predorder (root, left, right)
+        saveData(root->left, file);
+        saveData(root->right, file);
+    }
+
     // functions for calling from main()
     ////////////////////////////////////
 
+    // insert data
     void insertGamesPlayed(unsigned long long id, double hrsPlayed,
                            int achievements)
     {
@@ -105,12 +120,14 @@ class GamesPlayedTree
         root = insertNode(root, newNode);
     }
 
+    // delete data
     void deleteGamesPlayed(unsigned long long gameID)
     {
         root = deleteNode(root, gameID);
     }
-    //  bool searchGame(unsigned long long gameID) { return
-    // searchNode(root, gameID); }
+
+    // save data
+    void saveGamesPlayedByPlayerData(ofstream &file) { saveData(root, file); }
 };
 
 struct PlayerNode
@@ -225,6 +242,48 @@ class PlayerTree
         return nullptr;
     }
 
+    // saves data to a new csv file
+    void saveData(PlayerNode *root, ofstream &file)
+    {
+        if (root == nullptr)
+            return;
+
+        // else write the player data
+        file << endl
+             << root->playerID << ',' << root->name << ',' << root->phone_no
+             << ',' << root->email << ',' << root->password << ',';
+
+        // write the games played by the player info
+        root->gamesPlayed->saveGamesPlayedByPlayerData(file);
+
+        // save data in preorder traversal (root, left, right)
+        saveData(root->left, file);
+        saveData(root->right, file);
+    }
+
+    // functions for calling from main()
+    ////////////////////////////////////
+
+    // inserts data
+    void insertNewPlayer(unsigned long long id, string name, string phone,
+                         string email, string password,
+                         GamesPlayedTree *&GamesPlayed_byPlayer)
+    {
+        PlayerNode *newNode = new PlayerNode(id, name, phone, email, password,
+                                             GamesPlayed_byPlayer);
+        root = insertNode(root, newNode);
+    }
+
+    // deletes data
+    void deletePlayer(unsigned long long playerID)
+    {
+        root = deleteNode(root, playerID);
+    }
+
+    // saves data
+    void savePlayerData(ofstream &file) { saveData(root, file); }
+
+    // searches data
     PlayerNode *RetrievePlayer(unsigned long long playerID)
     {
         return RetrieveNode(root, playerID);
@@ -241,25 +300,6 @@ class PlayerTree
         cout << "\nPlayer password: " << root->password;
         // cout << "\nGames played: " << root->gamesPlayed;
     }
-
-    // functions for calling from main()
-    ////////////////////////////////////
-
-    void insertNewPlayer(unsigned long long id, string name, string phone,
-                         string email, string password,
-                         GamesPlayedTree *&GamesPlayed_byPlayer)
-    {
-        PlayerNode *newNode = new PlayerNode(id, name, phone, email, password,
-                                             GamesPlayed_byPlayer);
-        root = insertNode(root, newNode);
-    }
-
-    void deletePlayer(unsigned long long playerID)
-    {
-        root = deleteNode(root, playerID);
-    }
-    //  bool searchGame(unsigned long long gameID) { return
-    // searchNode(root, gameID); }
 };
 
 struct GameNode
@@ -370,9 +410,27 @@ class GameTree
         return nullptr;
     }
 
+    // saves data to a new csv file
+    void saveData(GameNode *root, ofstream &file)
+    {
+        if (root == nullptr)
+            return;
+
+        // else write the player data
+        file << endl
+             << root->gameID << ',' << root->name << ',' << root->developer
+             << ',' << root->publisher << ',' << root->fileSize,
+            ',' << root->downloads;
+
+        // save data in preorder traversal (root, left, right)
+        saveData(root->left, file);
+        saveData(root->right, file);
+    }
+
     // functions for calling from main()
     ////////////////////////////////////
 
+    // inserts data
     void insertNewGame(unsigned long long id, string name, string developer,
                        string publisher, float size, int downloads)
     {
@@ -381,15 +439,19 @@ class GameTree
         root = insertNode(root, newNode);
     }
 
+    // deletes data
     void deleteGame(unsigned long long gameID)
     {
         root = deleteNode(root, gameID);
     }
 
+    // searches data
     GameNode *RetrieveGame(unsigned long long gameID)
     {
         return RetrieveNode(root, gameID);
     }
+
+    void saveGameData(ofstream &file) { saveData(root, file); }
 
     // display information related to Game
     void displayGameInfo(GameNode *root)
@@ -595,6 +657,9 @@ int main()
 
         switch (input)
         {
+            // for quit
+            case 0:
+                break;
             case 1:
             {
                 cout << "\n------------------------------------";
@@ -709,6 +774,16 @@ int main()
                         cout << "deletion of player node successfull!";
                         break;
                     }
+                    case 4:
+                    {
+                        ofstream file("savePlayerData.csv");
+                        playerTree->savePlayerData(file);
+                        cout << "\n------------------------------------";
+                        cout << "\n Saving Player data to "
+                                "'savePlayerData.csv' .... completed!";
+                        cout << "\n------------------------------------";
+                        break;
+                    }
                     default:
                         cout << "\ninvalid option entered!";
                         break;
@@ -796,6 +871,16 @@ int main()
                         // delete the game
                         gameTree->deleteGame(gameID);
                         cout << "deletion of game node successfull!";
+                        break;
+                    }
+                    case 4:
+                    {
+                        ofstream file("saveGameData.csv");
+                        gameTree->saveGameData(file);
+                        cout << "\n------------------------------------";
+                        cout << "\n Saving Game data to "
+                                "'saveGameData.csv' .... completed!";
+                        cout << "\n------------------------------------";
                         break;
                     }
                     default:
