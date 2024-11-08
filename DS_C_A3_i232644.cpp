@@ -192,6 +192,19 @@ class GamesPlayedTree
         displayAllGames(root->right);
     }
 
+    GamesPlayedNode *RetrieveNode(GamesPlayedNode *root, unsigned long long ID)
+    {
+        if (root == nullptr)
+            return nullptr;
+        if (root->gameID == ID)
+            return root;
+        else if (ID < root->gameID)
+            return RetrieveNode(root->left, ID);
+        else
+            return RetrieveNode(root->right, ID);
+        return nullptr;
+    }
+
     // functions for calling from main()
     ////////////////////////////////////
 
@@ -208,6 +221,12 @@ class GamesPlayedTree
     void deleteGamesPlayed(unsigned long long gameID)
     {
         root = deleteNode(root, gameID);
+    }
+
+    // searches data's existence
+    bool RetrieveGamePlayed(unsigned long long ID)
+    {
+        return (RetrieveNode(root, ID) != nullptr);
     }
 
     // save data
@@ -514,6 +533,11 @@ class PlayerTree
         }
         temp->displayPlayerInfo();
         temp->gamesPlayed->printAllGames();
+    }
+
+    bool hasPlayed(PlayerNode *root, unsigned long long ID)
+    {
+        return root->gamesPlayed->RetrieveGamePlayed(ID);
     }
 
     // functions for calling from main()
@@ -1273,6 +1297,28 @@ int main()
                         cin >> ID;
                         if (playerTree->RetrievePlayer(ID) != nullptr)
                             playerTree->showDetails(ID);
+                        else
+                            cout << "\nID doesn't exist!";
+                        break;
+                    }
+                    case 11:
+                    {
+                        cout << "\n------------------------------------";
+                        cout << "\nHas played: ";
+                        cout << "\n------------------------------------";
+
+                        cout << "\nenter player ID: ";
+                        unsigned long long ID;
+                        cin >> ID;
+                        cout << "\nenter game ID: ";
+                        unsigned long long gameID;
+                        cin >> gameID;
+
+                        PlayerNode *temp = playerTree->RetrievePlayer(ID);
+                        if (temp != nullptr)
+                            cout << (playerTree->hasPlayed(temp, gameID)
+                                         ? "true"
+                                         : "false");
                         else
                             cout << "\nID doesn't exist!";
                         break;
