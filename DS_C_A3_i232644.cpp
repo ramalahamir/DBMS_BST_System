@@ -392,6 +392,17 @@ class PlayerTree
         return layer;
     }
 
+    // printing the preorder path
+    void showPath(PlayerNode *root, unsigned long long ID)
+    {
+        if (root == nullptr || root->playerID == ID)
+            return;
+
+        cout << root->playerID << "\t";
+        showPath(root->left, ID);
+        showPath(root->right, ID);
+    }
+
     // functions for calling from main()
     ////////////////////////////////////
 
@@ -422,6 +433,9 @@ class PlayerTree
 
     // root height
     int rootHeight() { return height(root); }
+
+    // show preorder traversal
+    void showPreorderTraversal(unsigned long long ID) { showPath(root, ID); }
 };
 
 struct GameNode
@@ -446,6 +460,18 @@ struct GameNode
         fileSize = size;
         downloads = dwnlds;
         left = right = nullptr;
+    }
+
+    // display information related to Game
+    void displayGameInfo()
+    {
+        cout << "\nGame Info: ";
+        cout << "\nGame ID: " << gameID;
+        cout << "\nGame Name: " << name;
+        cout << "\nGame developer: " << developer;
+        cout << "\nGame Publisher: " << publisher;
+        cout << "\nFile size (in GB): " << fileSize;
+        cout << "\nNumber of downloads: " << downloads;
     }
 };
 
@@ -560,6 +586,49 @@ class GameTree
         saveData(root->right, file);
     }
 
+    // printing in breadth first order till N layer
+    void print_N_layers(int N)
+    {
+        if (root == nullptr)
+            return;
+
+        Queue Q;
+        Q.enqueue(root->gameID); // size of layer one = 1
+
+        int layer = 1;
+        while (layer <= N)
+        {
+            // get the size of each layer
+            int layerSize = Q.Size();
+            int s = 0;
+
+            cout << "\n------------------------------------";
+            cout << "\nlayer no: " << layer;
+            cout << "\n------------------------------------";
+
+            while (s < layerSize)
+            {
+                unsigned long long ID = Q.dequeue();
+                GameNode *curr = RetrieveGame(ID);
+
+                cout << "\n------------------------------------";
+                curr->displayGameInfo();
+                cout << "\n------------------------------------";
+
+                if (curr->left != nullptr)
+                {
+                    Q.enqueue(curr->left->gameID);
+                }
+                if (curr->right != nullptr)
+                {
+                    Q.enqueue(curr->right->gameID);
+                }
+                s += 2; // because 2 childern are being inserted
+            }
+            layer++; // move to the next layer
+        }
+    }
+
     int layerNumber(unsigned long long ID)
     {
         GameNode *temp = RetrieveGame(ID);
@@ -570,6 +639,17 @@ class GameTree
         else
             cout << "\nID doesn't exist!";
         return layer;
+    }
+
+    // printing the preorder path
+    void showPath(GameNode *root, unsigned long long ID)
+    {
+        if (root == nullptr || root->gameID == ID)
+            return;
+
+        cout << root->gameID << "\t";
+        showPath(root->left, ID);
+        showPath(root->right, ID);
     }
 
     // functions for calling from main()
@@ -598,20 +678,11 @@ class GameTree
 
     void saveGameData(ofstream &file) { saveData(root, file); }
 
-    // display information related to Game
-    void displayGameInfo(GameNode *root)
-    {
-        cout << "\nGame Info: ";
-        cout << "\nGame ID: " << root->gameID;
-        cout << "\nGame Name: " << root->name;
-        cout << "\nGame developer: " << root->developer;
-        cout << "\nGame Publisher: " << root->publisher;
-        cout << "\nFile size (in GB): " << root->fileSize;
-        cout << "\nNumber of downloads: " << root->downloads;
-    }
-
     // root height
     int rootHeight() { return height(root); }
+
+    // show preorder traversal
+    void showPreorderTraversal(unsigned long long ID) { showPath(root, ID); }
 };
 
 // random function
@@ -963,6 +1034,26 @@ int main()
                              << playerTree->layerNumber(ID);
                         break;
                     }
+                    case 7:
+                    {
+                        cout << "\n------------------------------------";
+                        cout << "\nPrinting Preorder traversal path: ";
+                        cout << "\n------------------------------------";
+                        cout << "\nenter player ID: ";
+
+                        unsigned long long ID;
+                        cin >> ID;
+
+                        // if the player exists
+                        if (playerTree->RetrievePlayer(ID) != nullptr)
+                        {
+                            cout << "\npath of " << ID << " is :\n";
+                            playerTree->showPreorderTraversal(ID);
+                        }
+                        else
+                            cout << "\nplayer doesn't exist!";
+                        break;
+                    }
                     default:
                         cout << "\ninvalid option entered!";
                         break;
@@ -1036,7 +1127,7 @@ int main()
                         if (Node == nullptr)
                             cout << "Node doesn't exist!";
                         else
-                            gameTree->displayGameInfo(Node);
+                            Node->displayGameInfo();
                         break;
                     }
                     case 3:
@@ -1060,6 +1151,58 @@ int main()
                         cout << "\n Saving Game data to "
                                 "'saveGameData.csv' .... completed!";
                         cout << "\n------------------------------------";
+                        break;
+                    }
+                    case 5:
+                    {
+                        cout << "\n------------------------------------";
+                        cout << "\nPrinting N layers: ";
+                        cout << "\n------------------------------------";
+                        cout << "\nenter N: ";
+                        int N;
+                        cin >> N;
+
+                        // if N is negative or greater than layer
+                        if (N <= 0)
+                            cout << "\ninvalid input! N cannot be negative";
+                        else if (N > gameTree->rootHeight())
+                            cout << "\nLayer Limit was Reached, can’t go "
+                                    "further";
+                        else
+                            gameTree->print_N_layers(N);
+                        break;
+                    }
+                    case 6:
+                    {
+                        cout << "\n------------------------------------";
+                        cout << "\nPrinting corresponding layer: ";
+                        cout << "\n------------------------------------";
+                        cout << "\nenter game ID: ";
+
+                        unsigned long long ID;
+                        cin >> ID;
+                        cout << "\nlayer of " << ID << " is "
+                             << gameTree->layerNumber(ID);
+                        break;
+                    }
+                    case 7:
+                    {
+                        cout << "\n------------------------------------";
+                        cout << "\nPrinting Preorder traversal path: ";
+                        cout << "\n------------------------------------";
+                        cout << "\nenter game ID: ";
+
+                        unsigned long long ID;
+                        cin >> ID;
+
+                        // if only the game exists
+                        if (gameTree->RetrieveGame(ID) != nullptr)
+                        {
+                            cout << "\npath of " << ID << " is :\n";
+                            gameTree->showPreorderTraversal(ID);
+                        }
+                        else
+                            cout << "\ngame doesn't exist!";
                         break;
                     }
                     default:
