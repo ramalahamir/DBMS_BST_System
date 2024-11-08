@@ -392,6 +392,77 @@ class PlayerTree
         return layer;
     }
 
+    void editEntry(unsigned long long ID)
+    {
+        cout << "\nwhat would you like to edit?";
+        cout << "\n1. ID";
+        cout << "\n2. Name";
+        cout << "\n3. phone no";
+        cout << "\n4. email";
+        cout << "\n5. password";
+
+        int input;
+        cout << "\nenter: ";
+        cin >> input;
+
+        PlayerNode *oldNode = RetrievePlayer(ID);
+        cin.ignore();
+
+        if (input == 1)
+        {
+            unsigned long long id;
+            cout << "\nenter new id: ";
+            cin >> id;
+
+            // deleting the old node
+            deletePlayer(ID);
+            // making new node having the same data with different ID
+            insertNewPlayer(id, oldNode->name, oldNode->phone_no,
+                            oldNode->email, oldNode->password,
+                            oldNode->gamesPlayed);
+        }
+        else if (input == 2)
+        {
+            string name;
+            cout << "\nenter new name: ";
+            getline(cin, name);
+
+            oldNode->name = name;
+        }
+        else if (input == 3)
+        {
+            string phone;
+            cout << "\nenter new phone no: ";
+            getline(cin, phone);
+
+            oldNode->phone_no = phone;
+        }
+        else if (input == 4)
+        {
+            string email;
+            cout << "\nenter new email: ";
+            getline(cin, email);
+
+            oldNode->email = email;
+        }
+        else if (input == 5)
+        {
+            string password;
+            cout << "\nenter new password: ";
+            getline(cin, password);
+
+            oldNode->password = password;
+        }
+        else
+        {
+            cout << "\ninvalid input!";
+            return;
+        }
+        // displaying it to the user
+        cout << "\nchanges successfully made!";
+        oldNode->displayPlayerInfo();
+    }
+
     // printing the preorder path
     void showPath(PlayerNode *root, unsigned long long ID)
     {
@@ -650,6 +721,86 @@ class GameTree
         cout << root->gameID << "\t";
         showPath(root->left, ID);
         showPath(root->right, ID);
+    }
+
+    void editEntry(unsigned long long ID)
+    {
+        cout << "\nwhat would you like to edit?";
+        cout << "\n1. ID";
+        cout << "\n2. Name";
+        cout << "\n3. developer";
+        cout << "\n4. publisher";
+        cout << "\n5. filesize";
+        cout << "\n6. downloads";
+
+        int input;
+        cout << "\nenter: ";
+        cin >> input;
+
+        GameNode *oldNode = RetrieveGame(ID);
+        cin.ignore();
+
+        if (input == 1)
+        {
+            unsigned long long id;
+            cout << "\nenter new id: ";
+            cin >> id;
+
+            // deleting the old node
+            deleteGame(ID);
+            // making new node having the same data with different ID
+            insertNewGame(id, oldNode->name, oldNode->developer,
+                          oldNode->publisher, oldNode->fileSize,
+                          oldNode->downloads);
+        }
+        else if (input == 2)
+        {
+            string name;
+            cout << "\nenter new name: ";
+            getline(cin, name);
+
+            oldNode->name = name;
+        }
+        else if (input == 3)
+        {
+            string dev;
+            cout << "\nenter new phone no: ";
+            getline(cin, dev);
+
+            oldNode->developer = dev;
+        }
+        else if (input == 4)
+        {
+            string publisher;
+            cout << "\nenter new email: ";
+            getline(cin, publisher);
+
+            oldNode->publisher = publisher;
+        }
+        else if (input == 5)
+        {
+            float size;
+            cout << "\nenter new password: ";
+            cin >> size;
+
+            oldNode->fileSize = size;
+        }
+        else if (input == 6)
+        {
+            int downloads;
+            cout << "\nenter new password: ";
+            cin >> downloads;
+
+            oldNode->downloads = downloads;
+        }
+        else
+        {
+            cout << "\ninvalid input!";
+            return;
+        }
+        // displaying it to the user
+        cout << "\nchanges successfully made!";
+        oldNode->displayGameInfo();
     }
 
     // functions for calling from main()
@@ -1054,6 +1205,21 @@ int main()
                             cout << "\nplayer doesn't exist!";
                         break;
                     }
+                    case 8:
+                    {
+                        cout << "\n------------------------------------";
+                        cout << "\nEditing an entry: ";
+                        cout << "\n------------------------------------";
+                        cout << "\nenter player ID: ";
+
+                        unsigned long long ID;
+                        cin >> ID;
+                        if (playerTree->RetrievePlayer(ID) != nullptr)
+                            playerTree->editEntry(ID);
+                        else
+                            cout << "\nID doesn't exist!";
+                        break;
+                    }
                     default:
                         cout << "\ninvalid option entered!";
                         break;
@@ -1203,6 +1369,21 @@ int main()
                         }
                         else
                             cout << "\ngame doesn't exist!";
+                        break;
+                    }
+                    case 8:
+                    {
+                        cout << "\n------------------------------------";
+                        cout << "\nEditing an entry: ";
+                        cout << "\n------------------------------------";
+                        cout << "\nenter game ID: ";
+
+                        unsigned long long ID;
+                        cin >> ID;
+                        if (gameTree->RetrieveGame(ID) != nullptr)
+                            gameTree->editEntry(ID);
+                        else
+                            cout << "\nID doesn't exist!";
                         break;
                     }
                     default:
