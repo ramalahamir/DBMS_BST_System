@@ -71,5 +71,12 @@ Each task was carefully designed to work dynamically, avoiding hard-coded soluti
 
 Insertion, Search, Deletion: Average time complexity is O(log n) due to the BST structure.
 Top N Players, Show Details, Has Played: Algorithms are optimized with custom structures or conditions to ensure efficient access within the required complexity.
-Version Control
+
+- To achieve the required 2log(𝑛)
+
+2log(n) complexity for the Has Played function, I used two searches: one for the player and one for the games played within the player’s data. Both are done with binary search Tree search method, each taking log(𝑛) and log(n)
+m≤n. This results in a total time complexity of approximately 2log(n)
+
+###### Version Control
+
 This project uses GitHub for version control. Frequent and meaningful commits were made to track progress and document changes in functionality or optimization.
