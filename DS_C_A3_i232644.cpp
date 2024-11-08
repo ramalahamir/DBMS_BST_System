@@ -406,7 +406,7 @@ class PlayerTree
             cout << "\nlayer no: " << layer;
             cout << "\n------------------------------------";
 
-            while (s < layerSize)
+            while (s <= layerSize)
             {
                 unsigned long long ID = Q.dequeue();
                 PlayerNode *curr = RetrievePlayer(ID);
@@ -423,7 +423,7 @@ class PlayerTree
                 {
                     Q.enqueue(curr->right->playerID);
                 }
-                s += 2; // because 2 childern are being inserted
+                s += 1;
             }
             layer++; // move to the next layer
         }
@@ -513,14 +513,21 @@ class PlayerTree
     }
 
     // printing the preorder path
-    void showPath(PlayerNode *root, unsigned long long ID)
+    bool showPath(PlayerNode *root, unsigned long long ID)
     {
-        if (root == nullptr || root->playerID == ID)
-            return;
+        if (root == nullptr)
+            return false;
 
         cout << root->playerID << "\t";
-        showPath(root->left, ID);
-        showPath(root->right, ID);
+
+        if (root->playerID == ID)
+            return true;
+
+        // traverse both and if either finds the target return true
+        if (showPath(root->left, ID) || showPath(root->right, ID))
+            return true;
+
+        return false;
     }
 
     void showDetails(unsigned long long ID)
@@ -743,7 +750,7 @@ class GameTree
             cout << "\nlayer no: " << layer;
             cout << "\n------------------------------------";
 
-            while (s < layerSize)
+            while (s <= layerSize)
             {
                 unsigned long long ID = Q.dequeue();
                 GameNode *curr = RetrieveGame(ID);
@@ -779,14 +786,22 @@ class GameTree
     }
 
     // printing the preorder path
-    void showPath(GameNode *root, unsigned long long ID)
+    bool showPath(GameNode *root, unsigned long long ID)
     {
-        if (root == nullptr || root->gameID == ID)
-            return;
+
+        if (root == nullptr)
+            return false;
 
         cout << root->gameID << "\t";
-        showPath(root->left, ID);
-        showPath(root->right, ID);
+
+        if (root->gameID == ID)
+            return true;
+
+        // traverse both and if either finds the target return true
+        if (showPath(root->left, ID) || showPath(root->right, ID))
+            return true;
+
+        return false;
     }
 
     void editEntry(unsigned long long ID)
