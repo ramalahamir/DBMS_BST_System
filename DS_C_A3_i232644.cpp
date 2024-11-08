@@ -76,14 +76,27 @@ struct GamesPlayedNode
         achievements = ach;
         left = right = nullptr;
     }
+
+    void displayGamePlayed()
+    {
+        cout << "\n------------------------------------";
+        cout << "\nGame Played ID: " << gameID;
+        cout << "\nhours played: " << hoursPlayed;
+        cout << "\nachievements: " << achievements;
+    }
 };
 
 class GamesPlayedTree
 {
     GamesPlayedNode *root;
+    int size; // to keep track of how many games the player has played!
 
   public:
-    GamesPlayedTree() { root = nullptr; }
+    GamesPlayedTree()
+    {
+        root = nullptr;
+        size = 0;
+    }
     ~GamesPlayedTree() {}
 
     GamesPlayedNode *insertNode(GamesPlayedNode *root, GamesPlayedNode *newNode)
@@ -105,6 +118,7 @@ class GamesPlayedTree
             cout << "\nthis GamesPlayed record already exists!";
             cout << "\ncannot be re-entered!";
         }
+        size++;
         return root;
     }
 
@@ -146,6 +160,8 @@ class GamesPlayedTree
             root->gameID = temp->gameID;
             root->left = deleteNode(root->left, temp->gameID);
         }
+
+        size--;
         return root;
     }
 
@@ -161,6 +177,19 @@ class GamesPlayedTree
         // traversing the nodes in predorder (root, left, right)
         saveData(root->left, file);
         saveData(root->right, file);
+    }
+
+    int Size() { return size; }
+
+    // printing in preorder
+    void displayAllGames(GamesPlayedNode *root)
+    {
+        if (root == nullptr)
+            return;
+
+        root->displayGamePlayed();
+        displayAllGames(root->left);
+        displayAllGames(root->right);
     }
 
     // functions for calling from main()
@@ -183,6 +212,7 @@ class GamesPlayedTree
 
     // save data
     void saveGamesPlayedByPlayerData(ofstream &file) { saveData(root, file); }
+    void printAllGames() { displayAllGames(root); }
 };
 
 struct PlayerNode
@@ -472,6 +502,18 @@ class PlayerTree
         cout << root->playerID << "\t";
         showPath(root->left, ID);
         showPath(root->right, ID);
+    }
+
+    void showDetails(unsigned long long ID)
+    {
+        PlayerNode *temp = RetrievePlayer(ID);
+        if (temp == nullptr)
+        {
+            cout << "\nplayer doesn't exist";
+            return;
+        }
+        temp->displayPlayerInfo();
+        temp->gamesPlayed->printAllGames();
     }
 
     // functions for calling from main()
@@ -1216,6 +1258,21 @@ int main()
                         cin >> ID;
                         if (playerTree->RetrievePlayer(ID) != nullptr)
                             playerTree->editEntry(ID);
+                        else
+                            cout << "\nID doesn't exist!";
+                        break;
+                    }
+                    case 10:
+                    {
+                        cout << "\n------------------------------------";
+                        cout << "\nShow details: ";
+                        cout << "\n------------------------------------";
+                        cout << "\nenter player ID: ";
+
+                        unsigned long long ID;
+                        cin >> ID;
+                        if (playerTree->RetrievePlayer(ID) != nullptr)
+                            playerTree->showDetails(ID);
                         else
                             cout << "\nID doesn't exist!";
                         break;
